@@ -5,6 +5,7 @@ function compose(raw){let a=[...raw],out='';for(let i=0;i<a.length;){const c=C.i
 function board(parent,interact){for(const [label,set] of [['자음','ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ'],['모음','ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ']]){const row=el('div',parent,'tiles');el('strong',row,'',label);for(const c of set){let count=me.stock[c]||0,available=count-(interact?me.draft.filter(x=>x===c).length:0),b=btn(c+' ×'+(interact?available:count),()=>interact?.(c,b),row,me.seen.includes(c)?'owned':'empty');b.disabled=!interact||available<=0;if(interact&&available>0){b.draggable=true;b.ondragstart=e=>{interact(c,b);e.dataTransfer.setData("text/plain",c)}}}}}
 const vowelPairs={'ㅗㅏ':'ㅘ','ㅗㅣ':'ㅚ','ㅜㅓ':'ㅝ','ㅜㅣ':'ㅟ','ㅡㅣ':'ㅢ','ㅏㅣ':'ㅐ','ㅓㅣ':'ㅔ','ㅑㅣ':'ㅒ','ㅕㅣ':'ㅖ','ㅗㅏㅣ':'ㅙ','ㅜㅓㅣ':'ㅞ'};
 function blockVowel(b){const raw=b.below+b.right;return vowelPairs[raw]||raw}
+const slotLabels=[['first','자음'],['right','모음1'],['below','모음2'],['last','받침 자음']];
 const emptyBlock=()=>({first:'',right:'',below:'',last:''});
 function loadBlocks(mode){
   me.layouts??={};
@@ -38,7 +39,7 @@ function bench(mode){
     
     b[k]=value;save();bench(mode)
   }
-  blocks.forEach((b,i)=>{const frame=el('div',track,'blockFrame');for(const [k,label] of [['first','첫소리'],['right','오른쪽'],['below','아래'],['last','받침']]){
+  blocks.forEach((b,i)=>{const frame=el('div',track,'blockFrame');for(const [k,label] of slotLabels){
     const c=b[k],cell=btn(c||label,()=>{if(selected)place(i,k);else if(c)select(c,{i,k},cell);else say('먼저 주머니에서 카드를 골라요.')},frame,'slot '+k);
     cell.dataset.slot=i+'-'+k;cell.setAttribute('aria-label',(i+1)+'번째 글자 '+label+' '+c);
     cell.draggable=!!c;cell.ondragstart=e=>{select(c,{i,k},cell);e.dataTransfer.setData('text/plain',c)};
@@ -68,13 +69,36 @@ function drawingPad(parent, strokes, changed){
 }
 function showBenchTutorial(){
   const dialog=$('benchGuide');dialog.replaceChildren();
-  const scenes=[['첫소리를 왼쪽 위에 놓아요.','ㄱ','','','','ㄱ'],['ㅏ는 오른쪽에 붙여요.','ㄱ','ㅏ','','','가'],['ㅗ는 아래에 붙여요.','ㄱ','','ㅗ','','고'],['받침 ㄴ은 맨 아래에 놓아요.','ㄱ','','ㅗ','ㄴ','곤']];
-  const caption=el('h2',dialog),board=el('div',dialog,'demoBoard'),result=el('p',dialog,'word');
+  const scenes=[
+    ['자음 칸에 ㄱ을 놓아요.', 'ㄱ','','','','ㄱ',0],
+    ['오른쪽 모음1에 ㅏ를 놓으면 가!', 'ㄱ','ㅏ','','','가',1],
+    ['이번에는 아래 모음2에 ㅗ만 놓아요.', 'ㄱ','','ㅗ','','고',2],
+    ['ㅗ를 두고 오른쪽에 ㅏ를 더하면 과!', 'ㄱ','ㅏ','ㅗ','','과',1],
+    ['맨 아래 받침 자음에 ㄴ을 놓으면 관!', 'ㄱ','ㅏ','ㅗ','ㄴ','관',3]
+  ];
+  const caption=el('h2',dialog);
+  const tray=el('div',dialog,'blockTrack guideTrack');
+  const board=el('div',tray,'blockFrame');
+  const result=el('p',dialog,'word');
   let index=0,timer;
-  function render(){let [label,...parts]=scenes[index];caption.textContent=label;board.replaceChildren();
-    for(const [i,pos] of ['first','right','below','last'].entries()){let card=el('span',board,'demoTile '+pos,parts[i]);if(i===index)card.classList.add('arrive')}
-    result.textContent=parts[4];}
-  function play(){clearInterval(timer);index=0;render();timer=setInterval(()=>{if(index===3){clearInterval(timer);return}index++;render()},1700)}
+  function render(){
+    const [message,...parts]=scenes[index];
+    caption.textContent=message;
+    board.replaceChildren();
+    slotLabels.forEach(([position,label],i)=>{
+      const cell=el('div',board,'slot '+position);
+      el('small',cell,'',label);
+      if(parts[i]){
+        const tile=el('b',cell,'',parts[i]);
+        if(i===parts[5])tile.classList.add('movingCard');
+      }
+    });
+    result.textContent=parts[4];
+  }
+  function play(){
+    clearInterval(timer);index=0;render();
+    timer=setInterval(()=>{if(index===scenes.length-1){clearInterval(timer);return}index++;render()},2300);
+  }
   btn('다시 보기',play,dialog);btn('내가 해 볼래',()=>dialog.close(),dialog);
   dialog.onclose=()=>clearInterval(timer);dialog.showModal();play();
 }

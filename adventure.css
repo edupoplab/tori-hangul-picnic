@@ -19,3 +19,4 @@
 @media print{body>#printLetter .writingPaper{font-family:jua,"Malgun Gothic",sans-serif;font-size:18pt}}
 .mazeBoard .keyCell:after{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(19px,3vw,36px);line-height:1;background:radial-gradient(circle,#ffe5a0 0%,transparent 72%);pointer-events:none}
 .brand-footer{width:calc(100% - 24px);max-width:1076px;margin:8px auto 0;padding:8px 2px 16px;border-top:1px solid #dfd5b8;color:#625f55;text-align:right;font:400 12px/1.5 "Malgun Gothic","Apple SD Gothic Neo",sans-serif}
+.blockFrame{flex-basis:140px}.blockFrame .slot{white-space:nowrap}.guideTrack{justify-content:center;padding:14px}.guideTrack .blockFrame{flex-basis:180px}.guideTrack .slot{display:grid;place-items:center;min-height:49px}.guideTrack small{font-size:13px;color:#675431}.guideTrack b{font-size:26px}.movingCard{animation:cardArrives .8s ease-out}@media(prefers-reduced-motion:reduce){.movingCard{animation:none}}
