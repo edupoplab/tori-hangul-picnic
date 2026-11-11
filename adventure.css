@@ -18,3 +18,4 @@
 .writingPaper .noteField input,.writingPaper .noteField textarea,#printLetter .writingPaper{font-family:jua,"Malgun Gothic",sans-serif;font-weight:400;line-height:1.55;letter-spacing:.025em}
 @media print{body>#printLetter .writingPaper{font-family:jua,"Malgun Gothic",sans-serif;font-size:18pt}}
 .mazeBoard .keyCell:after{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(19px,3vw,36px);line-height:1;background:radial-gradient(circle,#ffe5a0 0%,transparent 72%);pointer-events:none}
+.brand-footer{margin:12px auto 0;padding:12px 16px 20px;text-align:center;font-size:15px;color:#596342;border-top:1px solid #d7c99d;max-width:1060px}
